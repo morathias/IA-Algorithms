@@ -11,6 +11,11 @@ public class BreadthFirst : PathFindingAlgorithm {
         _openedNodes = new Queue<Node>();
     }
 
+    protected override void OnStart()
+    {
+        _openedNodes.Clear();
+    }
+
     protected override Node makeCurrentNode()
     {
         Node currentNode = _openedNodes.Dequeue();

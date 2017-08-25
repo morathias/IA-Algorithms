@@ -10,6 +10,11 @@ public class DepthFirst : PathFindingAlgorithm {
         Debug.Log("DepthFirst");
     }
 
+    protected override void OnStart()
+    {
+        _openedNodes.Clear();
+    }
+
     protected override Node makeCurrentNode()
     {
         Node currentNode = _openedNodes.Pop();

@@ -11,6 +11,11 @@ public class Dijkstra : PathFindingAlgorithm {
         _openedNodes = new List<Node>();
     }
 
+    protected override void OnStart()
+    {
+        _openedNodes.Clear();
+    }
+
     protected override Node makeCurrentNode()
     {
         Node currentNode = _openedNodes[0];

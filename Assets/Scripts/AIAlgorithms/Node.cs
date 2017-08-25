@@ -36,6 +36,9 @@ public class Node {
     public Node getParent() {
         return _parent;
     }
+    public void resetParent() {
+        _parent = null;
+    }
 
     public void setScore(int score)
     {
