@@ -2,22 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Events
-{
-    StartMoving,
-    FinishedMining,
-    FinishedDeploying
-}
-
-public enum States
-{
-    Idle,
-    MovingToGoldmine,
-    Mining,
-    MovingToCastle,
-    Deploying
-}
-
 public class FSM : MonoBehaviour {
     public int[,] _stateMachineGrid;
 
@@ -33,13 +17,17 @@ public class FSM : MonoBehaviour {
     }
 
     public void setRelation(int originState, int relatedEvent, int targetState) {
+        _stateMachineGrid[originState, relatedEvent] = targetState;
     }
 
     public void setEvent(int eventToCheck) {
+        int eventToSet = _stateMachineGrid[_currentState, eventToCheck];
 
+        if(eventToSet != -1)
+            _currentState = eventToSet;
     }
 
-    public int getEvent() {
+    public int getState() {
         return _currentState;
     }
 }

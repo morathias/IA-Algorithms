@@ -3,36 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AgentMovement : MonoBehaviour {
-    Stack<Vector3> _path;
-    Vector3 _currentPositionToMove;
+    protected Stack<Vector3> _path;
+    protected Vector3 _currentPositionToMove;
     Vector3 _startPosition;
 
-    public float speed;
-    bool _startMoving = false;
+    Transform _mesh;
 
-    void Start() {
+    public float speed;
+    protected bool _startMoving = false;
+
+    protected virtual void Start() {
         _startPosition = transform.position;
+        _mesh = transform.GetChild(0);
     }
 
-	void Update () {
+	protected virtual void Update () {
         if (_startMoving)
         {
             Vector3 pos = Vector3.MoveTowards(transform.position, _currentPositionToMove, speed * Time.deltaTime);
             transform.position = pos;
+            
+            _mesh.LookAt(_currentPositionToMove + new Vector3(0.5f, 0, 0.5f));
 
             if(pos == _currentPositionToMove)
             {
                 if (_path.Count > 0)
                     _currentPositionToMove = _path.Pop();
             }
+            
         }
 	}
 
-    public void setPath(Stack<Vector3> path) {
-        _path = path;
-        _currentPositionToMove = _path.Pop();
-        _startMoving = true;
-    }
     public void reset() {
         _currentPositionToMove = _startPosition;
         _startMoving = false;

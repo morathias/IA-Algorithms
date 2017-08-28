@@ -22,14 +22,15 @@ public class PathFindingAlgorithm
                 _nodes[i, j].resetParent();
             }
         }
+        if(_closedNodes == null)
+            _closedNodes = new List<Node>();
+        else
+            _closedNodes.Clear();
 
-        _closedNodes = new List<Node>();
-        
         _goal = goal;
 
         OnStart();
-        _closedNodes.Clear();
-
+        
         Node currentNode;
 
         openNode(start);

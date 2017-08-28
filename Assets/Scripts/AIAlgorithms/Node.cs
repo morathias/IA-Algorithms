@@ -38,6 +38,7 @@ public class Node {
     }
     public void resetParent() {
         _parent = null;
+        _adjacentNodes.Clear();
     }
 
     public void setScore(int score)
