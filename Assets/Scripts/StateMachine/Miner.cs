@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum Events
 {
@@ -25,12 +26,14 @@ public class Miner : AgentMovement {
     public Grid grid;
 
     public GameObject goal;
+    Node goalNode;
 
     FSM _stateMachine;
 
     States _state;
 
     int _goldAmount = 0;
+    public Text goldAmountTxt;
 	
 	protected override void Start () {
         base.Start();
@@ -54,30 +57,66 @@ public class Miner : AgentMovement {
         switch (_state)
         {
             case States.Idle:
-                if (Input.GetMouseButtonDown(1)){
-                    _path = grid.startAlgorithm(transform.position, mouseToWorld());
-                    _currentPositionToMove = _path.Pop();
-                    _startMoving = true;
-                    goal.transform.position = mouseToWorld();
-
-                    _stateMachine.setEvent((int)Events.StartMoving);
-                }
+                idle();
                 break;
+
             case States.Moving:
                 base.Update();
+                moving();
+                break;
 
-                if (transform.position == _currentPositionToMove)
-                {
-                    _path.Clear();
-                    _stateMachine.setEvent((int)Events.ReachedPosition);
-                }
-                break;
             case States.Mining:
+                mining();
                 break;
+
             case States.Deploying:
+                deploying();
                 break;
         }
     }
+
+    void idle() {
+        if (Input.GetMouseButtonDown(1))
+        {
+            _path = grid.startAlgorithm(transform.position, mouseToWorld());
+            _currentPositionToMove = _path.Pop();
+            _startMoving = true;
+            goal.transform.position = mouseToWorld();
+
+            goalNode = grid.getNode((int)goal.transform.position.x, (int)goal.transform.position.z);
+
+            _stateMachine.setEvent((int)Events.StartMoving);
+        }
+    }
+
+    void moving() {
+        if (transform.position == _currentPositionToMove)
+        {
+            _path.Clear();
+            Debug.Log(goalNode.getScore());
+
+            if (goalNode.getScore() >= 100 && goalNode.getScore() <= 1000)
+                _stateMachine.setEvent((int)Events.ReachedMine);
+            else if (goalNode.getScore() >= 1000)
+                _stateMachine.setEvent((int)Events.ReachedCastle);
+            else
+                _stateMachine.setEvent((int)Events.ReachedPosition);
+        }
+    }
+
+    void mining() {
+        _goldAmount++;
+        goldAmountTxt.text = _goldAmount.ToString();
+        if (_goldAmount >= 1000)
+            _stateMachine.setEvent((int)Events.Finished);
+    }
+
+    void deploying() {
+        _goldAmount--;
+        goldAmountTxt.text = _goldAmount.ToString();
+        if (_goldAmount <= 0)
+            _stateMachine.setEvent((int)Events.Finished);
+    } 
 
     Vector3 mouseToWorld()
     {

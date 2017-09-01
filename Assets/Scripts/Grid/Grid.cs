@@ -80,11 +80,11 @@ public class Grid : MonoBehaviour {
                 break;
             case Algorithm.Dijkstra:
                 _pathFinderAlgorithm = new Dijkstra();
-                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), deletes tile";
+                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), Mine, castle,deletes tile";
                 break;
             case Algorithm.AStar:
                 _pathFinderAlgorithm = new AStar();
-                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), deletes tile";
+                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), Mine, castle,deletes tile";
                 break;
             default:
                 break;
@@ -120,5 +120,10 @@ public class Grid : MonoBehaviour {
     }
     public void setNodeScore(int col, int row, int score) {
         _nodes[col, row].setScore(score);
+        _nodes[col, row].setStartingScore(score);
+    }
+
+    public Node getNode(int col, int row) {
+        return _nodes[col, row];
     }
 }

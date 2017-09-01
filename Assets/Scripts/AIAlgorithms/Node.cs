@@ -12,6 +12,7 @@ public class Node {
     protected int _col, _row;
 
     int _score = 1;
+    int _startingScore = 1;
     int _heuristic = 0;
 
     public Node(int col, int row) {
@@ -39,11 +40,16 @@ public class Node {
     public void resetParent() {
         _parent = null;
         _adjacentNodes.Clear();
+        _score = _startingScore;
     }
 
     public void setScore(int score)
     {
         _score = score;
+        
+    }
+    public void setStartingScore(int startingScore) {
+        _startingScore = startingScore;
     }
     public int getScore()
     {
