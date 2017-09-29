@@ -7,4 +7,15 @@ public class BHLogicOr : BHLogic {
     {
         _type = "BHLogicOr";
     }
+
+    public override BHNodeState start()
+    {
+        if (_childs[0].start() == BHNodeState.OK)
+            return BHNodeState.OK;
+
+        if (_childs[1].start() == BHNodeState.OK)
+            return BHNodeState.OK;
+
+        return BHNodeState.ERROR;
+    }
 }

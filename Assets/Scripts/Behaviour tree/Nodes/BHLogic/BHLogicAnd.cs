@@ -7,4 +7,13 @@ public class BHLogicAnd : BHLogic {
     {
         _type = "BHLogicAnd";
     }
+
+    public override BHNodeState start()
+    {
+        if (_childs[0].start() == BHNodeState.OK &&
+           _childs[1].start() == BHNodeState.OK)
+            return BHNodeState.OK;
+
+        return BHNodeState.ERROR;
+    }
 }

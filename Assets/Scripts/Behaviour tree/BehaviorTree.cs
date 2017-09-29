@@ -44,18 +44,43 @@ public class BehaviorTree : MonoBehaviour {
             default:
                 break;
         }
-
-        BHSelector BHSelector = new BHSelector();
-        _root.addChild(BHSelector);
-
+        //first layer
         BHDecoratorInverter BHDecoratorInverter = new BHDecoratorInverter();
         _root.addChild(BHDecoratorInverter);
 
-        BHAction BHAction = new BHAction();
-        _root.getChild(0).addChild(BHAction);
+        BHConditional bhConditionalIsIddling = new BHConditional();
+        _root.getChild(0).addChild(bhConditionalIsIddling);
 
-        BHLogicAnd BHLogicAnd = new BHLogicAnd();
-        _root.getChild(1).addChild(BHLogicAnd);
+        BHSequencer bhSequencerMoving = new BHSequencer();
+        _root.addChild(bhSequencerMoving);
+        //second layer
+        BHAction bhActionMoving = new BHAction();
+        _root.getChild(1).addChild(bhActionMoving);
+
+        BHSelector bhSelectorMiningOrDeploying = new BHSelector();
+        _root.getChild(1).addChild(bhSelectorMiningOrDeploying);
+        //third layer
+        BHSequencer bhSequencerMining = new BHSequencer();
+        _root.getChild(1).getChild(1).addChild(bhSequencerMining);
+
+        BHConditional bhConditionalIsMine = new BHConditional();
+        _root.getChild(1).getChild(1).getChild(0).addChild(bhConditionalIsMine);
+
+        BHAction bhActionMining = new BHAction();
+        _root.getChild(1).getChild(1).getChild(0).addChild(bhActionMining);
+
+        BHSequencer bhSequencerDeploying = new BHSequencer();
+        _root.getChild(1).getChild(1).addChild(bhSequencerDeploying);
+
+        BHConditional bhConditionalIsCastle = new BHConditional();
+        _root.getChild(1).getChild(1).getChild(1).addChild(bhConditionalIsCastle);
+
+        BHConditional bhConditionalHasGold = new BHConditional();
+        _root.getChild(1).getChild(1).getChild(1).addChild(bhConditionalHasGold);
+
+        BHAction bhActionDeploying = new BHAction();
+        _root.getChild(1).getChild(1).getChild(1).addChild(bhActionDeploying);
+
 
         _root.displayTree();
 	}
@@ -63,4 +88,8 @@ public class BehaviorTree : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public BHNode getRoot() {
+        return _root;
+    }
 }

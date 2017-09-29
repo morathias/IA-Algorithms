@@ -8,4 +8,9 @@ public class BHLogic : BHNode {
         _type = "BHLogic";
     }
 
+    public override BHNodeState start()
+    {
+        return base.start();
+    }
+
 }
