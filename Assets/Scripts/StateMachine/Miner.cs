@@ -32,11 +32,16 @@ public class Miner : AgentMovement {
 
     States _state;
 
+    GameObject _goldBag;
     int _goldAmount = 0;
     public Text goldAmountTxt;
+
+    BehaviorTree _behaviourTree;
 	
 	protected override void Start () {
         base.Start();
+        _goldBag = transform.GetChild(1).gameObject;
+
         _stateMachine = GetComponent<FSM>();
         _stateMachine.init((int)States.StatesCount, (int)Events.EventsCount);
 
@@ -48,16 +53,30 @@ public class Miner : AgentMovement {
         _stateMachine.setRelation((int)States.Deploying, (int)Events.Finished, (int)States.Idle);
         _stateMachine.setRelation((int)States.Moving, (int)Events.ReachedMine, (int)States.Mining);
         _stateMachine.setRelation((int)States.Mining, (int)Events.Finished, (int)States.Idle);
+
+        _behaviourTree = GetComponent<BehaviorTree>();
+
+        _behaviourTree.getRoot().getChild(0).getChild(0).setFunctionToExecute(isIddling);
+        _behaviourTree.getRoot().getChild(1).getChild(0).setFunctionToExecute(moving);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(0).getChild(0).setFunctionToExecute(isMine);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(0).getChild(1).setFunctionToExecute(mining);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(0).setFunctionToExecute(isCastle);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(1).setFunctionToExecute(hasGold);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(2).setFunctionToExecute(deploying);
 	}
 
     protected override void Update()
     {
+        _behaviourTree.getRoot().start();
+    }
+
+    void stateMachine() {
         _state = (States)_stateMachine.getState();
 
         switch (_state)
         {
             case States.Idle:
-                idle();
+                isIddling();
                 break;
 
             case States.Moving:
@@ -75,7 +94,7 @@ public class Miner : AgentMovement {
         }
     }
 
-    void idle() {
+    BHNodeState isIddling() {
         if (Input.GetMouseButtonDown(1))
         {
             _path = grid.startAlgorithm(transform.position, mouseToWorld());
@@ -86,36 +105,83 @@ public class Miner : AgentMovement {
             goalNode = grid.getNode((int)goal.transform.position.x, (int)goal.transform.position.z);
 
             _stateMachine.setEvent((int)Events.StartMoving);
+            return BHNodeState.ERROR;
         }
+
+        return BHNodeState.OK;
     }
 
-    void moving() {
+    BHNodeState moving() {
+        _goldBag.transform.rotation = _mesh.transform.rotation;
+
+        Debug.Log("moving");
+        base.Update();
         if (transform.position == _currentPositionToMove)
-        {
             _path.Clear();
-            Debug.Log(goalNode.getScore());
 
-            if (goalNode.getScore() >= 100 && goalNode.getScore() <= 1000)
-                _stateMachine.setEvent((int)Events.ReachedMine);
-            else if (goalNode.getScore() >= 1000)
-                _stateMachine.setEvent((int)Events.ReachedCastle);
-            else
-                _stateMachine.setEvent((int)Events.ReachedPosition);
+        if (!_startMoving)
+        {
+            Debug.Log("reached position");
+            return BHNodeState.OK;
         }
+            
+        return BHNodeState.EXECUTING;
     }
 
-    void mining() {
+    BHNodeState isMine() {
+        if (goalNode.getScore() >= 100 && goalNode.getScore() <= 1000)
+            return BHNodeState.OK;
+
+        return BHNodeState.ERROR;
+    }
+
+    BHNodeState mining()
+    {
         _goldAmount++;
         goldAmountTxt.text = _goldAmount.ToString();
-        if (_goldAmount >= 1000)
+
+        _mesh.gameObject.SetActive(false);
+
+        if (_goldAmount >= 50)
+        {
             _stateMachine.setEvent((int)Events.Finished);
+
+            _mesh.gameObject.SetActive(true);
+            _goldBag.SetActive(true);
+
+            return BHNodeState.OK;
+        }
+
+        return BHNodeState.EXECUTING;
     }
 
-    void deploying() {
+    BHNodeState isCastle() {
+        if (goalNode.getScore() >= 1000)
+            return BHNodeState.OK;
+
+        return BHNodeState.ERROR;
+    }
+
+    BHNodeState hasGold() {
+        if (_goldAmount > 0)
+            return BHNodeState.OK;
+
+        return BHNodeState.ERROR;
+    }
+
+    BHNodeState deploying()
+    {
         _goldAmount--;
         goldAmountTxt.text = _goldAmount.ToString();
+
         if (_goldAmount <= 0)
+        {
             _stateMachine.setEvent((int)Events.Finished);
+            _goldBag.SetActive(false);
+            return BHNodeState.OK;
+        }
+
+        return BHNodeState.EXECUTING;
     } 
 
     Vector3 mouseToWorld()

@@ -10,14 +10,25 @@ public class BHDecoratorInverter : BHDecorator {
 
     public override BHNodeState start()
     {
-        if (_childs[0].start() == BHNodeState.OK)
+        BHNodeState result = _childs[0].start();
+
+        if (result == BHNodeState.OK)
+        {
+            Debug.Log("child finished, returning error");
             return BHNodeState.ERROR;
+        }
 
-        if (_childs[0].start() == BHNodeState.ERROR)
+        if (result == BHNodeState.ERROR)
+        {
+            Debug.Log("child failed, returning finished");
             return BHNodeState.OK;
+        }
 
-        if (_childs[0].start() == BHNodeState.EXECUTING)
+        if (result == BHNodeState.EXECUTING)
+        {
+            Debug.Log("child is executing, returning the same");
             return BHNodeState.EXECUTING;
+        }
 
         return BHNodeState.OK;
     }
