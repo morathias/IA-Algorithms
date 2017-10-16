@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GridBuilder : MonoBehaviour 
 {
-    public GameObject wallTile, waterTile, mudTile;
+    public GameObject[] wallTiles; 
+    public GameObject waterTile, mudTile;
+    public GameObject goldTile, castleTile;
 
     public Grid grid;
 
@@ -52,7 +54,7 @@ public class GridBuilder : MonoBehaviour
                  if (!grid.isWall((int)pos.x, (int)pos.z))
                  {
                      Debug.Log("creating wall");
-                     _obstacleTiles[(int)pos.x, (int)pos.z] = Instantiate(wallTile, pos, Quaternion.identity, gameObject.transform);
+                     _obstacleTiles[(int)pos.x, (int)pos.z] = Instantiate(wallTiles[Random.Range(0, 2)], pos, Quaternion.identity, gameObject.transform);
                      grid.makeWall((int)pos.x, (int)pos.z, true);
                  }
 
@@ -90,6 +92,18 @@ public class GridBuilder : MonoBehaviour
                             Destroy(_obstacleTiles[(int)pos.x, (int)pos.z]);
                             _obstacleTiles[(int)pos.x, (int)pos.z] = Instantiate(mudTile, pos, Quaternion.identity, gameObject.transform);
                             grid.setNodeScore((int)pos.x, (int)pos.z, 6);
+                            break;
+
+                        case 6:
+                            Destroy(_obstacleTiles[(int)pos.x, (int)pos.z]);
+                            _obstacleTiles[(int)pos.x, (int)pos.z] = Instantiate(goldTile, pos, Quaternion.identity, gameObject.transform);
+                            grid.setNodeScore((int)pos.x, (int)pos.z, 100);
+                            break;
+
+                        case 100:
+                            Destroy(_obstacleTiles[(int)pos.x, (int)pos.z]);
+                            _obstacleTiles[(int)pos.x, (int)pos.z] = Instantiate(castleTile, pos, Quaternion.identity, gameObject.transform);
+                            grid.setNodeScore((int)pos.x, (int)pos.z, 1000);
                             break;
 
                         default:

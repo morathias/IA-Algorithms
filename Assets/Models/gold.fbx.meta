@@ -1,25 +1,29 @@
 fileFormatVersion: 2
-guid: f9d2442ffbe07df439c98a34d7f17acd
-timeCreated: 1503268720
-licenseType: Free
+guid: 0689eb1fb2b920a40a0a063362029b2e
+timeCreated: 1503621029
+licenseType: Pro
 ModelImporter:
   serializedVersion: 21
   fileIDToRecycleName:
     100000: //RootNode
     100002: Camera
-    100004: Lamp
-    100006: Plane
+    100004: Circle
+    100006: Cube.001
+    100008: Lamp
     400000: //RootNode
     400002: Camera
-    400004: Lamp
-    400006: Plane
-    2000000: Camera
+    400004: Circle
+    400006: Cube.001
+    400008: Lamp
     2300000: //RootNode
-    2300002: Plane
+    2300002: Circle
+    2300004: Cube.001
     3300000: //RootNode
-    3300002: Plane
-    4300000: Plane
-    10800000: Lamp
+    3300002: Circle
+    3300004: Cube.001
+    4300000: gold
+    4300002: Cube.001
+    4300004: Circle
   materials:
     importMaterials: 1
     materialName: 0
@@ -50,10 +54,10 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    importVisibility: 1
+    importVisibility: 0
     importBlendShapes: 1
-    importCameras: 1
-    importLights: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -69,7 +73,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
-    normalCalculationMode: 4
+    normalCalculationMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:

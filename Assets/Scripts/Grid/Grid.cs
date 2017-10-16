@@ -23,15 +23,13 @@ public class Grid : MonoBehaviour {
 
     PathFindingAlgorithm _pathFinderAlgorithm;
 
-    public GameObject start, goal;
-
     Algorithm _currentAlgorithm;
 
 	void Start () {
-        _width = 10;
-        _height = 10;
-        widthInFd.text = "10";
-        heightInFd.text = "10";
+        _width = 30;
+        _height = 30;
+        widthInFd.text = "30";
+        heightInFd.text = "30";
 
         _tiles = new GameObject[_width, _height];
         _nodes = new Node[_width, _height];
@@ -82,25 +80,25 @@ public class Grid : MonoBehaviour {
                 break;
             case Algorithm.Dijkstra:
                 _pathFinderAlgorithm = new Dijkstra();
-                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), deletes tile";
+                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), Mine, castle,deletes tile";
                 break;
             case Algorithm.AStar:
                 _pathFinderAlgorithm = new AStar();
-                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), deletes tile";
+                instructionsTxt.text = "LMB: creates wall if not created, otherwise deletes it\nWASD: camera navigation\nRMB: add Water(3),Mud(6), Mine, castle,deletes tile";
                 break;
             default:
                 break;
         }
     }
 
-    public void startAlgorithm() {
-        _pathFinderAlgorithm.start(_nodes[(int)start.transform.position.x, (int)start.transform.position.z],
-                                   _nodes[(int)goal.transform.position.x, (int)goal.transform.position.z],
+    public Stack<Vector3> startAlgorithm(Vector3 start, Vector3 goal) {
+        _pathFinderAlgorithm.start(_nodes[(int)start.x, (int)start.z],
+                                   _nodes[(int)goal.x, (int)goal.z],
                                    _nodes);
 
-        _pathFinderAlgorithm.buildPath(_nodes[(int)goal.transform.position.x, (int)goal.transform.position.z]);
+        _pathFinderAlgorithm.buildPath(_nodes[(int)goal.x, (int)goal.z]);
 
-        start.GetComponent<AgentMovement>().setPath(_pathFinderAlgorithm.getPath());
+        return _pathFinderAlgorithm.getPath();
     }
 
     public int getWidth() {
@@ -122,5 +120,10 @@ public class Grid : MonoBehaviour {
     }
     public void setNodeScore(int col, int row, int score) {
         _nodes[col, row].setScore(score);
+        _nodes[col, row].setStartingScore(score);
+    }
+
+    public Node getNode(int col, int row) {
+        return _nodes[col, row];
     }
 }

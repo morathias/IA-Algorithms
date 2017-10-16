@@ -14,9 +14,23 @@ public class PathFindingAlgorithm
     public void start(Node start, Node goal, Node[,] nodes) 
     {
         _nodes = nodes;
-        _closedNodes = new List<Node>();
+
+        for (int i = 0; i < _nodes.GetLength(0); i++)
+        {
+            for (int j = 0; j < _nodes.GetLength(1); j++)
+            {
+                _nodes[i, j].resetParent();
+            }
+        }
+        if(_closedNodes == null)
+            _closedNodes = new List<Node>();
+        else
+            _closedNodes.Clear();
+
         _goal = goal;
 
+        OnStart();
+        
         Node currentNode;
 
         openNode(start);
@@ -42,6 +56,8 @@ public class PathFindingAlgorithm
             }
         }
     }
+
+    protected virtual void OnStart(){}
 
     protected virtual void openNode(Node node) { }
 
@@ -99,7 +115,10 @@ public class PathFindingAlgorithm
     }
 
     public void buildPath(Node goal) {
-        _path = new Stack<Vector3>();
+        if(_path == null)
+            _path = new Stack<Vector3>();
+        else
+            _path.Clear();
 
         goal.addToPath(ref _path);
     }
