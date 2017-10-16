@@ -28,15 +28,8 @@ public class Flocking : MonoBehaviour
 
     void Update()
     {
-        _recalculateTimer -= Time.deltaTime;
-
-        //time to calculate neighbourgs
-        if (_recalculateTimer <= 0)
-        {
-            clearBoidsNeighbours();
-            setBoidNeighbourgs();
-            _recalculateTimer = 0.10f;
-        }
+        clearBoidsNeighbours();
+        setBoidNeighbourgs();
     }
 
     void setBoidNeighbourgs()
