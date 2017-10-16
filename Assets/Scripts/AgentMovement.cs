@@ -7,7 +7,7 @@ public class AgentMovement : MonoBehaviour {
     protected Vector3 _currentPositionToMove;
     Vector3 _startPosition;
 
-    Transform _mesh;
+    protected Transform _mesh;
 
     public float speed;
     protected bool _startMoving = false;
@@ -29,6 +29,9 @@ public class AgentMovement : MonoBehaviour {
             {
                 if (_path.Count > 0)
                     _currentPositionToMove = _path.Pop();
+
+                else
+                    _startMoving = false;
             }
             
         }
