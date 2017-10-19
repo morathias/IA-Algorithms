@@ -37,11 +37,13 @@ public class Miner : AgentMovement {
     public Text goldAmountTxt;
 
     BehaviorTree _behaviourTree;
+
+    public Animator _animations;
 	
 	protected override void Start () {
         base.Start();
         _goldBag = transform.GetChild(1).gameObject;
-
+        
         _stateMachine = GetComponent<FSM>();
         _stateMachine.init((int)States.StatesCount, (int)Events.EventsCount);
 
@@ -67,6 +69,14 @@ public class Miner : AgentMovement {
 
     protected override void Update()
     {
+        if(_state == States.Idle)
+            _animations.Play("Miner_iddle");
+        if(_state == States.Moving)
+            _animations.Play("Miner_walking");
+        _animations.SetLookAtPosition(_currentPositionToMove + new Vector3(0.5f, 0f, 0.5f));
+    }
+
+    void LateUpdate() {
         _behaviourTree.getRoot().start();
     }
 
@@ -95,6 +105,9 @@ public class Miner : AgentMovement {
     }
 
     BHNodeState isIddling() {
+        _state = States.Idle;
+        
+
         if (Input.GetMouseButtonDown(1))
         {
             _path = grid.startAlgorithm(transform.position, mouseToWorld());
@@ -112,6 +125,8 @@ public class Miner : AgentMovement {
     }
 
     BHNodeState moving() {
+        _state = States.Moving;
+
         _goldBag.transform.rotation = _mesh.transform.rotation;
 
         Debug.Log("moving");

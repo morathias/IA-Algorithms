@@ -23,7 +23,8 @@ public class AgentMovement : MonoBehaviour {
             Vector3 pos = Vector3.MoveTowards(transform.position, _currentPositionToMove, speed * Time.deltaTime);
             transform.position = pos;
             
-            _mesh.LookAt(_currentPositionToMove + new Vector3(0.5f, 0, 0.5f));
+            //_mesh.LookAt(_currentPositionToMove + new Vector3(0.5f, 0, 0.5f));
+            //_mesh.rotation = Quaternion.LookRotation((_currentPositionToMove + new Vector3(0.5f, 0f, 0.5f)) - _mesh.position);
 
             if(pos == _currentPositionToMove)
             {

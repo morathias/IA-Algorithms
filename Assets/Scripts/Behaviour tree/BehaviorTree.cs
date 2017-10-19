@@ -16,6 +16,8 @@ public class BehaviorTree : MonoBehaviour {
 
     BHNode _root;
     public NodeType _rootType;
+
+    public BehaviourTreeComponent behaviourTreeComponent;
 	
 	void Start () {
         switch (_rootType)
@@ -80,7 +82,6 @@ public class BehaviorTree : MonoBehaviour {
 
         BHAction bhActionDeploying = new BHAction();
         _root.getChild(1).getChild(1).getChild(1).addChild(bhActionDeploying);
-
 
         _root.displayTree();
 	}
