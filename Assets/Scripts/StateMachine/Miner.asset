@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b7960df3332ea4a903f5b6b793e001, type: 3}
+  m_Name: Miner
+  m_EditorClassIdentifier: 
+  bhNodesSerializable:
+  - nodeType: 0
+    childCount: 2
+    indexOfFirstChild: 1
+    functionName: 
+    editorPos: {x: 153, y: 128}
+  - nodeType: 4
+    childCount: 1
+    indexOfFirstChild: 2
+    functionName: 
+    editorPos: {x: -9, y: 273}
+  - nodeType: 5
+    childCount: 0
+    indexOfFirstChild: 3
+    functionName: isIddling
+    editorPos: {x: -34, y: 414}
+  - nodeType: 0
+    childCount: 2
+    indexOfFirstChild: 4
+    functionName: 
+    editorPos: {x: 295, y: 275}
+  - nodeType: 6
+    childCount: 0
+    indexOfFirstChild: 5
+    functionName: moving
+    editorPos: {x: 164, y: 420}
+  - nodeType: 1
+    childCount: 2
+    indexOfFirstChild: 6
+    functionName: 
+    editorPos: {x: 419, y: 422}
+  - nodeType: 0
+    childCount: 2
+    indexOfFirstChild: 7
+    functionName: 
+    editorPos: {x: 263, y: 575}
+  - nodeType: 5
+    childCount: 0
+    indexOfFirstChild: 8
+    functionName: isMine
+    editorPos: {x: 118, y: 708}
+  - nodeType: 6
+    childCount: 0
+    indexOfFirstChild: 9
+    functionName: mining
+    editorPos: {x: 282, y: 709}
+  - nodeType: 0
+    childCount: 3
+    indexOfFirstChild: 10
+    functionName: 
+    editorPos: {x: 555, y: 577}
+  - nodeType: 5
+    childCount: 0
+    indexOfFirstChild: 11
+    functionName: isCastle
+    editorPos: {x: 448, y: 711}
+  - nodeType: 5
+    childCount: 0
+    indexOfFirstChild: 12
+    functionName: hasGold
+    editorPos: {x: 607, y: 712}
+  - nodeType: 6
+    childCount: 0
+    indexOfFirstChild: 13
+    functionName: deploying
+    editorPos: {x: 774, y: 712}
+  scriptPath: Assets/Scripts/StateMachine/Miner.cs

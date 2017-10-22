@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Reflection;
 
 public class BHEditorNode {
     Rect _rect, _childButtonRect, _parentButtonRect;
@@ -29,7 +30,9 @@ public class BHEditorNode {
     Rect _functionLabelRect;
     Rect _functionInputRect;
     GUIStyle _functionInputStyle;
-    string functionName = "name";
+    string functionName = "select function";
+
+    System.Type _scriptType;
 
     public BHEditorNode(NodeType nodeType, Vector2 position, GUIStyle style, GUIStyle childButtonStyle, GUIStyle parentButtonStyle) {
         _nodeType = nodeType;
@@ -105,6 +108,10 @@ public class BHEditorNode {
         _iconStyle.fixedHeight = 25;
     }
 
+    public void setScriptType(System.Type scriptType) {
+        _scriptType = scriptType;
+    }
+
     public void draw() 
     {
         if(!_isSelected)
@@ -117,7 +124,9 @@ public class BHEditorNode {
 
         if (_nodeType == NodeType.Action || _nodeType == NodeType.Conditional)
         {
-            functionName = GUI.TextField(_functionInputRect, functionName, _functionInputStyle);
+            if (GUI.Button(_functionInputRect, functionName + "()", _labelStyle))
+                showFunctionsMenu(_scriptType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance));
+
             GUI.Label(_functionLabelRect, "function:", _labelStyle);
             return;
         }
@@ -217,14 +226,26 @@ public class BHEditorNode {
         menu.ShowAsContext();
     }
 
-    void deleteThisNode() {
-        removeNode(this);
+    void showFunctionsMenu(MethodInfo[] methods) {
+        GenericMenu menu = new GenericMenu();
 
+        foreach (MethodInfo method in methods)
+        {
+            if (method.ReturnType == typeof(BHNodeState))
+                menu.AddItem(new GUIContent(method.Name + "()"), false, () => setFunctionName(method.Name));
+        }
+
+        menu.ShowAsContext();
+    }
+
+    void deleteThisNode() {
         if(_parent != null)
             _parent.removeChild(this);
 
         for (int i = 0; i < _childNodes.Count; i++)
             _childNodes[i].clearParent();
+
+        removeNode(this);
     }
 
     public bool parentButtonPressed() {
@@ -291,38 +312,21 @@ public class BHEditorNode {
         _parent = null;
     }
 
-    public void fillBHNode(BHNode bhNode) {
+    public void fillBHNode(List<BHNodeSerializable> serializableNodes) {
+        BHNodeSerializable serializableNode = new BHNodeSerializable();
+
+        serializableNode.nodeType = (int)_nodeType;
+        serializableNode.childCount = _childNodes.Count;
+        serializableNode.indexOfFirstChild = serializableNodes.Count + 1;
+        serializableNode.editorPos = _rect.position;
+
+        if (_nodeType == NodeType.Action || _nodeType == NodeType.Conditional)
+            serializableNode.functionName = functionName;
+
+        serializableNodes.Add(serializableNode);
+
         for (int i = 0; i < _childNodes.Count; i++)
-        {
-            BHNode node;
-            switch (_childNodes[i].getNodeType())
-            {
-                case NodeType.Sequencer:
-                    node = new BHSequencer();
-                    break;
-                case NodeType.Selector:
-                    node = new BHSelector();
-                    break;
-                case NodeType.LogicAnd:
-                    node = new BHLogicAnd();
-                    break;
-                case NodeType.LogicOr:
-                    node = new BHLogicOr();
-                    break;
-                case NodeType.DecoratorInverter:
-                    node = new BHDecoratorInverter();
-                    break;
-                case NodeType.Conditional:
-                    node = new BHConditional();
-                    break;
-                case NodeType.Action:
-                    node = new BHAction();
-                    break;
-                default:
-                    node = new BHNode();
-                    break;
-            }
-        }
+            _childNodes[i].fillBHNode(serializableNodes);
     }
 
     public void drawConnectedChilds() 
@@ -366,5 +370,13 @@ public class BHEditorNode {
 
     public NodeType getNodeType() {
         return _nodeType;
+    }
+
+    public string getFunctionName() {
+        return functionName;
+    }
+    public void setFunctionName(string name)
+    {
+        functionName = name;
     }
 }

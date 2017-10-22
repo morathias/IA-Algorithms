@@ -19,21 +19,14 @@ public class BHSelector : BHNode {
             result = _childs[i].start();
 
             if (result == BHNodeState.ERROR)
-            {
-                Debug.Log("child " + i + " failed");
                 i++;
-            }
 
             else if (result == BHNodeState.EXECUTING)
-            {
-                Debug.Log("child " + i + " executing");
                 return result;
-            }
 
             else break;
         }
 
-        Debug.Log("child " + i + " finished");
         i = 0;
         return BHNodeState.OK;
     }

@@ -4034,7 +4034,7 @@ Prefab:
         type: 2}
       propertyPath: behaviourTreeComponent
       value: 
-      objectReference: {fileID: 11400000, guid: 22ea8b79fd657ad4ea76b74293089d6e,
+      objectReference: {fileID: 11400000, guid: ed79e3ee08d6dc141af0417843c3b75b,
         type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df3d7cabeae6b4040815fa4e9c8d927a, type: 2}

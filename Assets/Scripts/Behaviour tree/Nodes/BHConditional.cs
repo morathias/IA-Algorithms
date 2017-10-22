@@ -14,10 +14,7 @@ public class BHConditional : BHNode {
         BHNodeState result = _nodeFunction();
 
         if (result == BHNodeState.EXECUTING)
-        {
-            Debug.Log("child is executing, returning error");
             return BHNodeState.ERROR;
-        }
 
         return result;
     }

@@ -1,24 +1,78 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Xml;
+using System;
+using System.Reflection;
 
-[System.Serializable]
 public class BehaviourTreeComponent : ScriptableObject 
 {
-    BHNode _root;
+    public List<BHNodeSerializable> bhNodesSerializable = new List<BHNodeSerializable>();
 
-    XmlDocument _editorState;
+    public string scriptPath;
 
-    public void setRootNode(BHNode rootNode) {
-        _root = rootNode;
-    }
+    public int loadTree<T>(int index, out BHNode node, T instanceType) {
+        BHNodeSerializable serializableNode = bhNodesSerializable[index];
 
-    public void saveEditorState(XmlDocument editorState) {
-        _editorState = editorState;
-    }
+        MethodInfo function;
+        NodeFunction functionToExecute;
 
-    public XmlDocument getEditorState() {
-        return _editorState;
+        switch ((NodeType)serializableNode.nodeType)
+        {
+            case NodeType.Sequencer:
+                node = new BHSequencer();
+                break;
+            case NodeType.Selector:
+                node = new BHSelector();
+                break;
+            case NodeType.LogicAnd:
+                node = new BHLogicAnd();
+                break;
+            case NodeType.LogicOr:
+                node = new BHLogicOr();
+                break;
+            case NodeType.DecoratorInverter:
+                node = new BHDecoratorInverter();
+                break;
+            case NodeType.Conditional:
+                node = new BHConditional();
+
+                function = instanceType.GetType().GetMethod(serializableNode.functionName, BindingFlags.NonPublic | BindingFlags.Instance);
+                if (function != null)
+                {
+                    Debug.Log("setting function");
+                    functionToExecute = (NodeFunction)Delegate.CreateDelegate(typeof(NodeFunction),
+                                                                              instanceType,
+                                                                              function);
+                    node.setFunctionToExecute(functionToExecute);
+                }
+                break;
+
+            case NodeType.Action:
+                node = new BHAction();
+
+                function = instanceType.GetType().GetMethod(serializableNode.functionName, BindingFlags.NonPublic | BindingFlags.Instance);
+                if (function != null)
+                {
+                    Debug.Log("setting function");
+                    functionToExecute = (NodeFunction)Delegate.CreateDelegate(typeof(NodeFunction),
+                                                                              instanceType,
+                                                                              function);
+                    node.setFunctionToExecute(functionToExecute);
+                }
+                break;
+
+            default:
+                node = new BHNode();
+                break;
+        }
+
+        for (int i = 0; i < serializableNode.childCount; i++)
+        {
+            BHNode childNode;
+            index = loadTree<T>(++index, out childNode, instanceType);
+            node.addChild(childNode);
+        }
+
+        return index;
     }
 }

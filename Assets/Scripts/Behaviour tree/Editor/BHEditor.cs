@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Reflection;
 
 public static class RectExtensions {
     public static Vector2 topLeft(this Rect rect) {
@@ -31,6 +32,7 @@ public static class RectExtensions {
 }
 
 public class BHEditor : EditorWindow {
+    BHEditorNode root;
     List<BHEditorNode> _nodes = new List<BHEditorNode>();
 
     BHEditorNode selectedParentNode;
@@ -48,6 +50,8 @@ public class BHEditor : EditorWindow {
     Matrix4x4 _oldMatrix;
     Vector2 vanishingPoint;
 
+    MonoScript script;
+
     public BehaviourTreeComponent behaviourTreeComponent;
 
     Rect bhTreeComponentRect = new Rect(0f, 0f, 250f, 20f);
@@ -59,8 +63,6 @@ public class BHEditor : EditorWindow {
     }
 
     void OnEnable() {
-        Debug.Log("On Enabled");
-
         parentButtonStyle = new GUIStyle();
         parentButtonStyle.normal.background = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Textures/parent_button.png", typeof(Texture2D));
         parentButtonStyle.active.background = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Textures/parent_button_pressed.png", typeof(Texture2D));
@@ -77,6 +79,12 @@ public class BHEditor : EditorWindow {
         nodeBoxStyle.normal.background = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Textures/node_normal.png", typeof(Texture2D));
         nodeBoxStyle.active.background = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Textures/node_selected.png", typeof(Texture2D));
         nodeBoxStyle.fixedHeight = 90f;
+        if (behaviourTreeComponent != null)
+        {
+            loadScript();
+            if (behaviourTreeComponent.bhNodesSerializable.Count > 0)
+                readBHTreeComponent(0, out root);
+        }
     }
 
     void OnGUI() 
@@ -92,16 +100,45 @@ public class BHEditor : EditorWindow {
 
         drawNodes();
 
-        EditorGUI.BeginChangeCheck();
-        behaviourTreeComponent = (BehaviourTreeComponent)EditorGUI.ObjectField(bhTreeComponentRect,  
-                                                                               behaviourTreeComponent, 
-                                                                               typeof(BehaviourTreeComponent));
-        if (EditorGUI.EndChangeCheck()) {
-
-        }
-
+        drawMenu();
        // endZoomArea();
         if (GUI.changed) Repaint();
+    }
+
+    void drawMenu() {
+        GUI.Box(new Rect(0f, 0f, 260f, 100f), "");
+
+        EditorGUI.BeginChangeCheck();
+        behaviourTreeComponent = (BehaviourTreeComponent)EditorGUI.ObjectField(bhTreeComponentRect,
+                                                                               behaviourTreeComponent,
+                                                                               typeof(BehaviourTreeComponent));
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            loadScript();
+            _nodes.Clear();
+
+            if (behaviourTreeComponent == null || behaviourTreeComponent.bhNodesSerializable.Count == 0)
+                _nodes.Clear();
+            else
+            {
+                if (behaviourTreeComponent.bhNodesSerializable.Count > 0)
+                    readBHTreeComponent(0, out root);
+            }
+        }
+
+        if (behaviourTreeComponent != null)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            script = (MonoScript)EditorGUI.ObjectField(new Rect(0, 20, 250, 20), script, typeof(MonoScript));
+
+            if (EditorGUI.EndChangeCheck())
+                behaviourTreeComponent.scriptPath = AssetDatabase.GetAssetPath(script);
+        }
+
+        if (GUI.Button(new Rect(0, 40, 100, 20), "save state"))
+            fillBHTreeComponent(script.GetClass());
     }
 
     void beginZoomArea() {
@@ -136,25 +173,15 @@ public class BHEditor : EditorWindow {
             if (_nodes[i].parentButtonPressed()) {
                 selectedChildNode = _nodes[i];
 
-                Debug.Log("node " + i + "is waiting for parent");
-
                 if (selectedParentNode != null)
-                {
-                    Debug.Log("making connection");
                     setConnection();
-                }
             }
 
             if (_nodes[i].childButtonPressed()) {
                 selectedParentNode = _nodes[i];
 
-                Debug.Log("node " + i + "is waiting for child");
-
                 if (selectedChildNode != null)
-                {
-                    Debug.Log("making connection");
                     setConnection();
-                }
             }
         }
     }
@@ -181,6 +208,8 @@ public class BHEditor : EditorWindow {
 
         selectedChildNode = null;
         selectedParentNode = null;
+
+        fillBHTreeComponent(script.GetClass());
     }
 
     void processEvents(Event events) {
@@ -190,7 +219,8 @@ public class BHEditor : EditorWindow {
         switch (events.type)
         {
             case EventType.ContextClick:
-                showPopUpMenu(events);
+                if(behaviourTreeComponent != null)
+                    showPopUpMenu(events);
                 break;
 
             case EventType.DragExited:
@@ -273,6 +303,9 @@ public class BHEditor : EditorWindow {
 
         node.removeNode = removeNode;
 
+        if (type == NodeType.Action || type == NodeType.Conditional)
+            node.setScriptType(script.GetClass());
+
         _nodes.Add(node);
     }
 
@@ -296,39 +329,46 @@ public class BHEditor : EditorWindow {
 
     void removeNode(BHEditorNode node) {
         _nodes.Remove(node);
+        fillBHTreeComponent(script.GetClass());
     }
 
-    void fillBHTreeComponent() {
-        BHNode root;
-        switch (_nodes[0].getNodeType())
+    void fillBHTreeComponent(System.Type scriptType) {
+        behaviourTreeComponent.bhNodesSerializable.Clear();
+        _nodes[0].fillBHNode(behaviourTreeComponent.bhNodesSerializable);
+        
+        EditorUtility.SetDirty(behaviourTreeComponent);
+    }
+
+    int readBHTreeComponent(int index, out BHEditorNode bhEditorNode) {
+        BHNodeSerializable serializableNode = behaviourTreeComponent.bhNodesSerializable[index];
+
+        bhEditorNode = new BHEditorNode((NodeType)serializableNode.nodeType, 
+                                                  serializableNode.editorPos, 
+                                                  nodeBoxStyle, childButtonStyle, parentButtonStyle);
+
+        bhEditorNode.setFunctionName(serializableNode.functionName);
+        bhEditorNode.removeNode = removeNode;
+        bhEditorNode.setScriptType(script.GetClass());
+
+        _nodes.Add(bhEditorNode);
+
+        for (int i = 0; i < serializableNode.childCount; i++)
         {
-            case NodeType.Sequencer:
-                root = new BHSequencer();
-                break;
-            case NodeType.Selector:
-                root = new BHSelector();
-                break;
-            case NodeType.LogicAnd:
-                root = new BHLogicAnd();
-                break;
-            case NodeType.LogicOr:
-                root = new BHLogicOr();
-                break;
-            case NodeType.DecoratorInverter:
-                root = new BHDecoratorInverter();
-                break;
-            case NodeType.Conditional:
-                root = new BHConditional();
-                break;
-            case NodeType.Action:
-                root = new BHAction();
-                break;
-            default:
-                root = new BHNode();
-                break;
+            BHEditorNode childEditorNode;
+            index = readBHTreeComponent(++index, out childEditorNode);
+            childEditorNode.setParent(bhEditorNode);
+            bhEditorNode.addChild(childEditorNode);
         }
 
-        _nodes[0].fillBHNode(root);
+        return index;
+    }
+
+    void loadScript() {
+        if (behaviourTreeComponent == null)
+            return;
+
+        if (behaviourTreeComponent.scriptPath.Length > 0)
+            script = (MonoScript)AssetDatabase.LoadAssetAtPath<MonoScript>(behaviourTreeComponent.scriptPath);
     }
 
     private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)

@@ -8,13 +8,14 @@ public enum BHNodeState{
     ERROR
 }
 
+public delegate BHNodeState NodeFunction();
+
 public class BHNode {
     protected List<BHNode> _childs;
     BHNode _parent;
 
     protected string _type;
 
-    public delegate BHNodeState NodeFunction();
     protected NodeFunction _nodeFunction;
 
     public BHNode() {
@@ -50,10 +51,20 @@ public class BHNode {
     }
 
     public void setFunctionToExecute(NodeFunction function) {
-        _nodeFunction = function;
+        if (function != null)
+            _nodeFunction = function;
     }
 
     public void setParent(BHNode parent) {
         _parent = parent;
     }
+}
+
+[System.Serializable]
+public struct BHNodeSerializable {
+    public int nodeType;
+    public int childCount;
+    public int indexOfFirstChild;
+    public string functionName;
+    public Vector2 editorPos;
 }

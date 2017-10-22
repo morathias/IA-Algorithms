@@ -58,13 +58,16 @@ public class Miner : AgentMovement {
 
         _behaviourTree = GetComponent<BehaviorTree>();
 
-        _behaviourTree.getRoot().getChild(0).getChild(0).setFunctionToExecute(isIddling);
+        _behaviourTree.BHSetup<Miner>(this);
+        _behaviourTree.getRoot().displayTree();
+
+        /*_behaviourTree.getRoot().getChild(0).getChild(0).setFunctionToExecute(isIddling);
         _behaviourTree.getRoot().getChild(1).getChild(0).setFunctionToExecute(moving);
         _behaviourTree.getRoot().getChild(1).getChild(1).getChild(0).getChild(0).setFunctionToExecute(isMine);
         _behaviourTree.getRoot().getChild(1).getChild(1).getChild(0).getChild(1).setFunctionToExecute(mining);
         _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(0).setFunctionToExecute(isCastle);
         _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(1).setFunctionToExecute(hasGold);
-        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(2).setFunctionToExecute(deploying);
+        _behaviourTree.getRoot().getChild(1).getChild(1).getChild(1).getChild(2).setFunctionToExecute(deploying);*/
 	}
 
     protected override void Update()
@@ -77,7 +80,11 @@ public class Miner : AgentMovement {
     }
 
     void LateUpdate() {
-        _behaviourTree.getRoot().start();
+        if (_behaviourTree.getRoot() != null)
+            _behaviourTree.getRoot().start();
+
+        else
+            Debug.Log("root null");
     }
 
     void stateMachine() {
@@ -182,6 +189,11 @@ public class Miner : AgentMovement {
             return BHNodeState.OK;
 
         return BHNodeState.ERROR;
+    }
+
+    BHNodeState culo() {
+        Debug.Log("culo");
+        return BHNodeState.OK;
     }
 
     BHNodeState deploying()
