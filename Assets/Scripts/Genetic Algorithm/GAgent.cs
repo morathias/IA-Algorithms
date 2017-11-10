@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class GAgent : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    Chromosome _chromosome = new Chromosome();
+
+    int _currentGen = 0;
+
+    public Chromosome getChromosome() {
+        return _chromosome;
+    }
+
+    public int getGenIndex() {
+        return _currentGen;
+    }
+
+    public void nextGen() {
+        if(_currentGen < _chromosome.getGenes().Count - 1)
+            _currentGen++;
+    }
 }

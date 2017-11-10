@@ -2,27 +2,78 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum LanderAction {
+    None,
+    Thrust,
+    RotateRight,
+    RotateLeft,
+    actionsCount
+}
+
 public class Lander : MonoBehaviour {
 
     Rigidbody _rigidBody;
+    GAgent _geneticSelf;
 
-	// Use this for initialization
+    float _actionTimer = 0;
+
 	void Start () {
         _rigidBody = GetComponent<Rigidbody>();
+        _geneticSelf = GetComponent<GAgent>();
 	}
 	
-	// Update is called once per frame
 	void Update () {
-        if (Input.GetKey(KeyCode.W))
-            _rigidBody.AddForce(transform.up, ForceMode.Acceleration);
+        executeAction(_geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getAction(), 
+                      _geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getTime());
+    }
 
-        if (Input.GetKey(KeyCode.D))
-            _rigidBody.AddTorque(-transform.forward * 0.5f);
-        if (Input.GetKey(KeyCode.A))
-            _rigidBody.AddTorque(transform.forward * 0.5f);
+    void rotateLeft() {
+        _rigidBody.AddTorque(transform.forward * 0.5f);
+    }
 
-        Debug.Log(Mathf.Abs(_rigidBody.velocity.y));
+    void rotateRight() {
+        _rigidBody.AddTorque(-transform.forward * 0.5f);
+    }
 
+    void thrust() {
+        _rigidBody.AddForce(transform.up, ForceMode.Acceleration);
+    }
+
+    void executeAction(LanderAction action, float time) {
+        switch (action)
+        {
+            case LanderAction.None:
+                waitForTime(time);
+                break;
+
+            case LanderAction.Thrust:
+                thrust();
+                waitForTime(time);
+                break;
+
+            case LanderAction.RotateRight:
+                rotateRight();
+                waitForTime(time);
+                break;
+
+            case LanderAction.RotateLeft:
+                rotateLeft();
+                waitForTime(time);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    void waitForTime(float time) {
+        _actionTimer += Time.deltaTime;
+
+        if (_actionTimer >= time)
+        {
+            _geneticSelf.nextGen();
+            _actionTimer = 0;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
