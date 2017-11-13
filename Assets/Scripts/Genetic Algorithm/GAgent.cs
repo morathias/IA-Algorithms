@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GAgent : MonoBehaviour {
+public class GAgent {
 
-    Chromosome _chromosome = new Chromosome();
+    Chromosome _chromosome;
 
     int _currentGen = 0;
 
-    public Chromosome getChromosome() {
+    public int id;
+
+    public void setChromosome(Chromosome chromosome) {
+        _chromosome = chromosome;
+    }
+    public Chromosome getChromosome(){
         return _chromosome;
     }
 
@@ -17,7 +22,10 @@ public class GAgent : MonoBehaviour {
     }
 
     public void nextGen() {
-        if(_currentGen < _chromosome.getGenes().Count - 1)
+        if(_currentGen < _chromosome.getGenes().Count)
             _currentGen++;
+    }
+    public void resetGenIndex() {
+        _currentGen = 0;
     }
 }

@@ -14,8 +14,14 @@ public class Gen {
     public float getTime() {
         return _time;
     }
+    public void mutateTime(float mutation) {
+        _time += mutation;
+    }
 
     public LanderAction getAction() {
         return _action;
+    }
+    public void mutateAction(LanderAction mutation) {
+        _action = mutation;
     }
 }

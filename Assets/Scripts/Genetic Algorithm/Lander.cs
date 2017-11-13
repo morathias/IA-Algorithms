@@ -17,14 +17,51 @@ public class Lander : MonoBehaviour {
 
     float _actionTimer = 0;
 
+    int _landed = 1;
+    float _flyingTime = 0;
+
+    Vector3 _startPosition;
+
 	void Start () {
         _rigidBody = GetComponent<Rigidbody>();
-        _geneticSelf = GetComponent<GAgent>();
 	}
+
+    public void setGAgent(GAgent gAgent) {
+        _geneticSelf = gAgent;
+    }
+
+    public void setStartPosition(Vector3 startPosition) {
+        _startPosition = startPosition;
+    }
 	
-	void Update () {
-        executeAction(_geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getAction(), 
-                      _geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getTime());
+	void FixedUpdate () {
+        if (transform.position.x <= -15)
+            transform.position = new Vector3(15, transform.position.y, 0);
+        if(transform.position.x >= 15)
+            transform.position = new Vector3(-15, transform.position.y, 0);
+        if(transform.position.y > 16)
+            transform.position = new Vector3(transform.position.x, 16, 0);
+
+        if (_geneticSelf.getGenIndex() < _geneticSelf.getChromosome().getGenes().Count)
+            executeAction(_geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getAction(),
+                          _geneticSelf.getChromosome().getGenes()[_geneticSelf.getGenIndex()].getTime());
+
+        _geneticSelf.getChromosome().inSimulation(_rigidBody.velocity,
+                                                  GameObject.FindGameObjectWithTag("platform").transform.position - gameObject.transform.position,
+                                                  _flyingTime, _landed,
+                                                  transform.rotation.eulerAngles.z);
+    }
+
+    public void reset() {
+        transform.position = _startPosition;
+        transform.rotation = Quaternion.identity;
+        _rigidBody.ResetCenterOfMass();
+        _rigidBody.ResetInertiaTensor();
+        _rigidBody.Sleep();
+        _geneticSelf.resetGenIndex();
+        _actionTimer = 0;
+        _flyingTime = 0;
+        Debug.Log(_geneticSelf.getGenIndex());
     }
 
     void rotateLeft() {
@@ -67,8 +104,8 @@ public class Lander : MonoBehaviour {
     }
 
     void waitForTime(float time) {
-        _actionTimer += Time.deltaTime;
-
+        _actionTimer += Time.fixedDeltaTime;
+        
         if (_actionTimer >= time)
         {
             _geneticSelf.nextGen();
@@ -78,15 +115,11 @@ public class Lander : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (transform.rotation.eulerAngles.z < Quaternion.Euler(0, 0, 340).eulerAngles.z && 
-            transform.rotation.eulerAngles.z > Quaternion.Euler(0, 0, 20).eulerAngles.z)
-            Destroy(gameObject);
-
-        if (_rigidBody.velocity.y > 1)
-            Destroy(gameObject);
-
         if (collision.transform.tag == "platform") {
             _rigidBody.Sleep();
+            _landed = 100;
         }
+
+        _landed = 0;
     }
 }

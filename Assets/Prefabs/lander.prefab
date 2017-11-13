@@ -24,8 +24,7 @@ GameObject:
   - component: {fileID: 54659463870582950}
   - component: {fileID: 65434650529519948}
   - component: {fileID: 114254089654843760}
-  - component: {fileID: 114987592599162766}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: lander
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +96,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 48
+  m_Constraints: 56
   m_CollisionDetection: 0
 --- !u!65 &65434650529519948
 BoxCollider:
@@ -120,16 +119,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ced06d8d0ccdff64e871e05cb72a8d8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114987592599162766
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1245236400153658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 175b01bd679565245ab8bc006725d594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

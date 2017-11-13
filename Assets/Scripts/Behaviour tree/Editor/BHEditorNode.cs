@@ -36,7 +36,6 @@ public class BHEditorNode {
 
     public BHEditorNode(NodeType nodeType, Vector2 position, GUIStyle style, GUIStyle childButtonStyle, GUIStyle parentButtonStyle) {
         _nodeType = nodeType;
-        Debug.Log(_nodeType);
 
         _style = style;
         _selectedStyle = new GUIStyle();
