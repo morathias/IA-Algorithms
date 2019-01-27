@@ -8,7 +8,6 @@ public class Chromosome {
 
     float _score = 0;
 
-
     public Chromosome(System.Random random)
     {
         _genes = new List<Gen>();
